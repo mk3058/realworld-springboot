@@ -267,3 +267,8 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#setting files
+application.properties
+application.yaml
+application.yml
