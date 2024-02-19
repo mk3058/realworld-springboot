@@ -1,12 +1,17 @@
 package com.minkyu.realworld.user.domain;
 
 import com.google.common.base.Preconditions;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -31,16 +36,24 @@ public class User {
     @Column(length = 100)
     private String bio;
 
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15)
+    private Role role;
+
     public User(String username, String email, String password) {
-        this(null, username, email, password, null, null);
+        this(null, username, email, password, null, null, Role.ROLE_USER);
     }
 
-    private User(Long id, String username, String email, String password, UUID image, String bio) {
+    private User(Long id, String username, String email, String password, UUID image, String bio,
+        Role role) {
         Preconditions.checkNotNull(username, "username must be provided");
         Preconditions.checkNotNull(email, "email must be provided");
         Preconditions.checkNotNull(password, "password must be provided");
-        Preconditions.checkArgument(username.length() <= 10, "username must be 10 characters or less");
+        Preconditions.checkNotNull(role, "role must be provided");
+        Preconditions.checkArgument(username.length() <= 10,
+            "username must be 10 characters or less");
         Preconditions.checkArgument(email.length() <= 50, "email must be 50 characters or less");
+        Preconditions.checkArgument(role.equals(Role.ROLE_USER), "Initial role cannot be admin");
         if (bio != null) {
             Preconditions.checkArgument(bio.length() <= 100, "bio must be 100 characters or less");
         }
@@ -51,13 +64,17 @@ public class User {
         this.username = username;
         this.image = image;
         this.bio = bio;
+        this.role = role;
     }
 
-    public void update(String username, String email, String password, UUID image, String bio) {
+    public void update(String username, String email, String password, UUID image, String bio,
+        Role role) {
         Preconditions.checkNotNull(username, "username must be provided");
         Preconditions.checkNotNull(email, "email must be provided");
         Preconditions.checkNotNull(password, "password must be provided");
-        Preconditions.checkArgument(username.length() <= 10, "username must be 10 characters or less");
+        Preconditions.checkNotNull(role, "role must be provided");
+        Preconditions.checkArgument(username.length() <= 10,
+            "username must be 10 characters or less");
         Preconditions.checkArgument(email.length() <= 50, "email must be 50 characters or less");
         if (bio != null) {
             Preconditions.checkArgument(bio.length() <= 100, "bio must be 100 characters or less");
@@ -68,5 +85,6 @@ public class User {
         this.password = password;
         this.image = image;
         this.bio = bio;
+        this.role = role;
     }
 }
