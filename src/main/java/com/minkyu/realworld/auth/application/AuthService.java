@@ -4,6 +4,7 @@ import com.minkyu.realworld.auth.presentation.dto.AuthResponse;
 import com.minkyu.realworld.auth.presentation.dto.JoinRequest;
 import com.minkyu.realworld.auth.presentation.dto.LoginRequest;
 import com.minkyu.realworld.common.exception.UserAlreadyExistsException;
+import com.minkyu.realworld.common.exception.UserNotFoundException;
 import com.minkyu.realworld.jwt.JwtUtil;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
@@ -12,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +45,7 @@ public class AuthService {
         String password = dto.password();
 
         User user = userRepository.findByEmail(email).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with email: " + email));
+            () -> new UserNotFoundException("User not found with email: " + email));
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(user.getUsername(), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
