@@ -8,7 +8,9 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public record ErrorResponse(List<String> body) {
 
-    public static ErrorResponse FromMessages(List<String> messages) {
+    public static ErrorResponse fromMessage(String message) {
+        List<String> messages = message.lines().toList();
+
         return new ErrorResponse(messages);
     }
 }
