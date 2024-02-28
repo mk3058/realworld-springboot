@@ -8,7 +8,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,7 +30,7 @@ public class User {
     @Column(length = 10, unique = true, nullable = false)
     private String username;
 
-    private UUID image;
+    private String image;
 
     @Column(length = 100)
     private String bio;
@@ -44,7 +43,7 @@ public class User {
         this(null, username, email, password, null, null, Role.ROLE_USER);
     }
 
-    private User(Long id, String username, String email, String password, UUID image, String bio,
+    private User(Long id, String username, String email, String password, String image, String bio,
         Role role) {
         Preconditions.checkNotNull(username, "username must be provided");
         Preconditions.checkNotNull(email, "email must be provided");
@@ -67,7 +66,7 @@ public class User {
         this.role = role;
     }
 
-    public void update(String username, String email, String password, UUID image, String bio,
+    public void update(String username, String email, String password, String image, String bio,
         Role role) {
         Preconditions.checkNotNull(username, "username must be provided");
         Preconditions.checkNotNull(email, "email must be provided");
