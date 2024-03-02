@@ -2,11 +2,19 @@ package com.minkyu.realworld.auth.presentation.dto;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.minkyu.realworld.common.validation.Validation;
 import com.minkyu.realworld.user.domain.User;
 
 @JsonTypeName("user")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 public record AuthResponse(String email, String token, String username, String bio, String image) {
+
+    public AuthResponse {
+        Validation.email(email);
+        Validation.username(username);
+        Validation.url(image, true);
+        Validation.bio(bio, true);
+    }
 
     public static AuthResponse fromUser(User user) {
         return new AuthResponse(user.getEmail(), null, user.getUsername(), user.getBio(),

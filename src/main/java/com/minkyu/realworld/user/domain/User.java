@@ -1,6 +1,7 @@
 package com.minkyu.realworld.user.domain;
 
 import com.google.common.base.Preconditions;
+import com.minkyu.realworld.common.validation.Validation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,17 +46,12 @@ public class User {
 
     private User(Long id, String username, String email, String password, String image, String bio,
         Role role) {
-        Preconditions.checkNotNull(username, "username must be provided");
-        Preconditions.checkNotNull(email, "email must be provided");
-        Preconditions.checkNotNull(password, "password must be provided");
-        Preconditions.checkNotNull(role, "role must be provided");
-        Preconditions.checkArgument(username.length() <= 10,
-            "username must be 10 characters or less");
-        Preconditions.checkArgument(email.length() <= 50, "email must be 50 characters or less");
-        Preconditions.checkArgument(role.equals(Role.ROLE_USER), "Initial role cannot be admin");
-        if (bio != null) {
-            Preconditions.checkArgument(bio.length() <= 100, "bio must be 100 characters or less");
-        }
+        Validation.username(username);
+        Validation.email(email);
+        Validation.password(password);
+        Validation.url(image, true);
+        Validation.bio(bio, true);
+        Validation.role(role);
 
         this.id = id;
         this.email = email;
@@ -68,22 +64,22 @@ public class User {
 
     public void update(String username, String email, String password, String image, String bio,
         Role role) {
-        Preconditions.checkNotNull(username, "username must be provided");
-        Preconditions.checkNotNull(email, "email must be provided");
-        Preconditions.checkNotNull(password, "password must be provided");
-        Preconditions.checkNotNull(role, "role must be provided");
-        Preconditions.checkArgument(username.length() <= 10,
-            "username must be 10 characters or less");
-        Preconditions.checkArgument(email.length() <= 50, "email must be 50 characters or less");
-        if (bio != null) {
-            Preconditions.checkArgument(bio.length() <= 100, "bio must be 100 characters or less");
-        }
+        Validation.username(username, true);
+        Validation.email(email, true);
+        Validation.password(password, true);
+        Validation.url(image, true);
+        Validation.bio(bio, true);
+        Validation.role(role, true);
+        Preconditions.checkArgument(
+            email != null || username != null || password != null || image != null || bio != null,
+            "At least one parameter must be given");
 
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.image = image;
-        this.bio = bio;
-        this.role = role;
+        this.username = (username != null) ? username : this.username;
+        this.email = (email != null) ? email : this.email;
+        this.password = (password != null) ? password : this.password;
+        this.image = (image != null) ? image : this.image;
+        this.bio = (bio != null) ? bio : this.bio;
+        this.role = (role != null) ? role : this.role;
+
     }
 }
