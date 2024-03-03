@@ -1,10 +1,10 @@
 package com.minkyu.realworld.auth.presentation;
 
 import com.minkyu.realworld.auth.application.AuthService;
-import com.minkyu.realworld.auth.presentation.dto.AuthResponse;
 import com.minkyu.realworld.auth.presentation.dto.JoinRequest;
 import com.minkyu.realworld.auth.presentation.dto.LoginRequest;
 import com.minkyu.realworld.common.error.ErrorResponse;
+import com.minkyu.realworld.user.presentation.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,7 +22,7 @@ public class AuthController {
     @PostMapping("")
     public ResponseEntity<?> join(@RequestBody JoinRequest dto) {
         try {
-            AuthResponse response = authService.join(dto);
+            UserResponse response = authService.join(dto);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity()
@@ -33,7 +33,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest dto) {
         try {
-            AuthResponse response = authService.login(dto);
+            UserResponse response = authService.login(dto);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity()

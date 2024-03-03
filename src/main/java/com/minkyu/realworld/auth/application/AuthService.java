@@ -1,6 +1,5 @@
 package com.minkyu.realworld.auth.application;
 
-import com.minkyu.realworld.auth.presentation.dto.AuthResponse;
 import com.minkyu.realworld.auth.presentation.dto.JoinRequest;
 import com.minkyu.realworld.auth.presentation.dto.LoginRequest;
 import com.minkyu.realworld.common.exception.UserAlreadyExistsException;
@@ -9,6 +8,7 @@ import com.minkyu.realworld.jwt.CustomUserDetails;
 import com.minkyu.realworld.jwt.JwtUtil;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
+import com.minkyu.realworld.user.presentation.dto.UserResponse;
 import jakarta.security.auth.message.AuthException;
 import java.nio.file.attribute.UserPrincipalNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class AuthService {
 
 
     @Transactional
-    public AuthResponse join(JoinRequest dto) throws Exception {
+    public UserResponse join(JoinRequest dto) throws Exception {
         String username = dto.username();
         String email = dto.email();
         String encodedPassword = bCryptPasswordEncoder.encode(dto.password());
@@ -42,11 +42,11 @@ public class AuthService {
 
         User user = new User(username, email, encodedPassword);
         userRepository.save(user);
-        return AuthResponse.fromUser(user);
+        return UserResponse.fromUser(user);
     }
 
     @Transactional
-    public AuthResponse login(LoginRequest dto) throws Exception {
+    public UserResponse login(LoginRequest dto) throws Exception {
         String email = dto.email();
         String password = dto.password();
 
@@ -56,7 +56,7 @@ public class AuthService {
             new UsernamePasswordAuthenticationToken(user.getUsername(), password));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtUtil.createJwt(user.getUsername(), user.getRole().name());
-        return new AuthResponse(user.getEmail(), token, user.getUsername(), user.getBio(),
+        return new UserResponse(user.getEmail(), token, user.getUsername(), user.getBio(),
             user.getImage());
     }
 
