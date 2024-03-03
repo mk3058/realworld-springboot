@@ -11,6 +11,7 @@ import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public class FollowService {
     private final UserRepository userRepository;
     private final AuthService authService;
 
+    @Transactional
     public ProfileResponse createByUsername(String followeeName) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User follower = userRepository.findByUsername(userDetails.getUsername())
@@ -36,6 +38,7 @@ public class FollowService {
         return ProfileResponse.fromEntity(followee, isFollower(follower, followee));
     }
 
+    @Transactional
     public ProfileResponse deleteByUsername(String followeeName) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User follower = userRepository.findByUsername(userDetails.getUsername())
@@ -51,6 +54,7 @@ public class FollowService {
         return ProfileResponse.fromEntity(followee, isFollower(follower, followee));
     }
 
+    @Transactional(readOnly = true)
     public Boolean isFollower(User follower, User followee) throws Exception {
         return followRepository.existsByFollowerAndFollowee(follower, followee);
     }
