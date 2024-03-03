@@ -1,6 +1,7 @@
 package com.minkyu.realworld.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class JwtUtil {
 
     private String secret;
-    
+
     private Long accessTokenValidityInSeconds;
 
     public String getUsername(String token) {
@@ -37,10 +38,15 @@ public class JwtUtil {
 
     public Boolean isExpired(String token) {
 
-        return Jwts.parserBuilder()
+        Date expiration = Jwts.parserBuilder()
             .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret))).build()
             .parseClaimsJws(token).getBody()
-            .getExpiration().before(new Date());
+            .getExpiration();
+
+        if (expiration == null) {
+            return false;
+        }
+        return expiration.before(new Date());
     }
 
     public String createJwt(String username, String role) {
@@ -49,12 +55,14 @@ public class JwtUtil {
         claims.put("username", username);
         claims.put("role", role);
 
-        return Jwts.builder()
+        JwtBuilder jwt = Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(
-                new Date(System.currentTimeMillis() + accessTokenValidityInSeconds * 1000))
-            .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)), SignatureAlgorithm.HS256)
-            .compact();
+            .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)), SignatureAlgorithm.HS256);
+        if (accessTokenValidityInSeconds > 0) {
+            jwt.setExpiration(
+                new Date(System.currentTimeMillis() + accessTokenValidityInSeconds * 1000));
+        }
+        return jwt.compact();
     }
 }
