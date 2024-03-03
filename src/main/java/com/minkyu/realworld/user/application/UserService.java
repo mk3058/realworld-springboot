@@ -12,6 +12,7 @@ import com.minkyu.realworld.user.presentation.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class UserService {
     private final AuthService authService;
     private final FollowService followService;
 
+    @Transactional(readOnly = true)
     public ProfileResponse findCurrentUser() throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
@@ -31,6 +33,7 @@ public class UserService {
         return ProfileResponse.fromEntity(user, false);
     }
 
+    @Transactional(readOnly = true)
     public ProfileResponse findUserByUsername(String username) throws Exception {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("Cannot find user " + username));
@@ -46,6 +49,7 @@ public class UserService {
         return ProfileResponse.fromEntity(user, followService.isFollower(current, user));
     }
 
+    @Transactional
     public ProfileResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
