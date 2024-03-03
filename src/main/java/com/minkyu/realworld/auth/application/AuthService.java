@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
 
+    @Transactional
     public AuthResponse join(JoinRequest dto) throws Exception {
         String username = dto.username();
         String email = dto.email();
@@ -43,6 +45,7 @@ public class AuthService {
         return AuthResponse.fromUser(user);
     }
 
+    @Transactional
     public AuthResponse login(LoginRequest dto) throws Exception {
         String email = dto.email();
         String password = dto.password();
@@ -57,6 +60,7 @@ public class AuthService {
             user.getImage());
     }
 
+    @Transactional(readOnly = true)
     public CustomUserDetails findAuthenticatedUser() throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
