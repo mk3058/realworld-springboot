@@ -42,7 +42,7 @@ public class AuthService {
 
         User user = new User(username, email, encodedPassword);
         userRepository.save(user);
-        return UserResponse.fromUser(user);
+        return UserResponse.fromEntity(user);
     }
 
     @Transactional

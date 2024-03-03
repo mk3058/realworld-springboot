@@ -16,7 +16,7 @@ public record UserResponse(String email, String token, String username, String b
         Validation.bio(bio, true);
     }
 
-    public static UserResponse fromUser(User user) {
+    public static UserResponse fromEntity(User user) {
         return new UserResponse(user.getEmail(), null, user.getUsername(), user.getBio(),
             user.getImage());
     }
