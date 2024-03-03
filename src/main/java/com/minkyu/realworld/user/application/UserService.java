@@ -2,6 +2,7 @@ package com.minkyu.realworld.user.application;
 
 import com.minkyu.realworld.auth.application.AuthService;
 import com.minkyu.realworld.common.exception.UserNotFoundException;
+import com.minkyu.realworld.follow.application.FollowService;
 import com.minkyu.realworld.follow.domain.repository.FollowRepository;
 import com.minkyu.realworld.jwt.CustomUserDetails;
 import com.minkyu.realworld.user.domain.User;
@@ -9,7 +10,6 @@ import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
 import com.minkyu.realworld.user.presentation.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +21,7 @@ public class UserService {
     private final FollowRepository followRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final AuthService authService;
+    private final FollowService followService;
 
     public ProfileResponse findCurrentUser() throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
@@ -34,7 +35,15 @@ public class UserService {
         User user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("Cannot find user " + username));
 
-        return ProfileResponse.fromEntity(user, isFollower(user));
+        CustomUserDetails userDetails;
+        try {
+            userDetails = authService.findAuthenticatedUser();
+        } catch (Exception e) {
+            return ProfileResponse.fromEntity(user, false);
+        }
+        User current = userRepository.findByUsername(userDetails.getUsername())
+            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+        return ProfileResponse.fromEntity(user, followService.isFollower(current, user));
     }
 
     public ProfileResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
@@ -48,13 +57,5 @@ public class UserService {
         }
         user.update(dto.username(), dto.email(), requestedPassword, dto.image(), dto.bio(), null);
         return ProfileResponse.fromEntity(user, false);
-    }
-
-    private Boolean isFollower(User target) throws Exception {
-        CustomUserDetails userDetails = authService.findAuthenticatedUser();
-        User current = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
-            NotFoundException::new);
-
-        return followRepository.existsByFollowerIdAndFolloweeId(current.getId(), target.getId());
     }
 }
