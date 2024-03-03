@@ -5,9 +5,12 @@ import com.minkyu.realworld.auth.presentation.dto.JoinRequest;
 import com.minkyu.realworld.auth.presentation.dto.LoginRequest;
 import com.minkyu.realworld.common.exception.UserAlreadyExistsException;
 import com.minkyu.realworld.common.exception.UserNotFoundException;
+import com.minkyu.realworld.jwt.CustomUserDetails;
 import com.minkyu.realworld.jwt.JwtUtil;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
+import jakarta.security.auth.message.AuthException;
+import java.nio.file.attribute.UserPrincipalNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -54,4 +57,17 @@ public class AuthService {
             user.getImage());
     }
 
+    public CustomUserDetails findAuthenticatedUser() throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AuthException("User not authenticated!");
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            return (CustomUserDetails) principal;
+        }
+        throw new UserPrincipalNotFoundException("Cannot find UserDetails!");
+    }
 }

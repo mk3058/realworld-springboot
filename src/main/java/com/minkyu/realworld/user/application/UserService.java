@@ -1,5 +1,6 @@
 package com.minkyu.realworld.user.application;
 
+import com.minkyu.realworld.auth.application.AuthService;
 import com.minkyu.realworld.common.exception.UserNotFoundException;
 import com.minkyu.realworld.follow.domain.repository.FollowRepository;
 import com.minkyu.realworld.jwt.CustomUserDetails;
@@ -7,12 +8,8 @@ import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
 import com.minkyu.realworld.user.presentation.dto.UserUpdateRequest;
-import jakarta.security.auth.message.AuthException;
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +20,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final AuthService authService;
 
     public ProfileResponse findCurrentUser() throws Exception {
-        CustomUserDetails userDetails = findAuthenticatedUser();
+        CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
 
@@ -40,7 +38,7 @@ public class UserService {
     }
 
     public ProfileResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
-        CustomUserDetails userDetails = findAuthenticatedUser();
+        CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
         String requestedPassword = dto.password();
@@ -51,27 +49,12 @@ public class UserService {
         user.update(dto.username(), dto.email(), requestedPassword, dto.image(), dto.bio(), null);
         return ProfileResponse.fromEntity(user, false);
     }
-    
+
     private Boolean isFollower(User target) throws Exception {
-        CustomUserDetails userDetails = findAuthenticatedUser();
+        CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User current = userRepository.findByUsername(userDetails.getUsername()).orElseThrow(
             NotFoundException::new);
 
         return followRepository.existsByFollowerIdAndFolloweeId(current.getId(), target.getId());
     }
-
-    private CustomUserDetails findAuthenticatedUser() throws Exception {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AuthException("User not authenticated!");
-        }
-
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof CustomUserDetails) {
-            return (CustomUserDetails) principal;
-        }
-        throw new UserPrincipalNotFoundException("Cannot find UserDetails!");
-    }
-
 }
