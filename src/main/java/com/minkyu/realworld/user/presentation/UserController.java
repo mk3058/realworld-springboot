@@ -3,6 +3,7 @@ package com.minkyu.realworld.user.presentation;
 import com.minkyu.realworld.common.error.ErrorResponse;
 import com.minkyu.realworld.user.application.UserService;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
+import com.minkyu.realworld.user.presentation.dto.UserResponse;
 import com.minkyu.realworld.user.presentation.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class UserController {
     @GetMapping("/user")
     public ResponseEntity<?> getCurrentUser() {
         try {
-            ProfileResponse profileResponse = userService.findCurrentUser();
+            UserResponse profileResponse = userService.findCurrentUser();
             return ResponseEntity.ok(profileResponse);
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity()
@@ -45,7 +46,7 @@ public class UserController {
     @PutMapping("/user")
     public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest dto) {
         try {
-            ProfileResponse profileResponse = userService.updateCurrentUser(dto);
+            UserResponse profileResponse = userService.updateCurrentUser(dto);
             return ResponseEntity.ok(profileResponse);
         } catch (Exception e) {
             return ResponseEntity.unprocessableEntity()

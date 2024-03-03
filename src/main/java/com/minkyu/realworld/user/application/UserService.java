@@ -8,6 +8,7 @@ import com.minkyu.realworld.jwt.CustomUserDetails;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
+import com.minkyu.realworld.user.presentation.dto.UserResponse;
 import com.minkyu.realworld.user.presentation.dto.UserUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -25,12 +26,12 @@ public class UserService {
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public ProfileResponse findCurrentUser() throws Exception {
+    public UserResponse findCurrentUser() throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
 
-        return ProfileResponse.fromEntity(user, false);
+        return UserResponse.fromEntity(user);
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public ProfileResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
+    public UserResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
@@ -60,6 +61,6 @@ public class UserService {
             requestedPassword = bCryptPasswordEncoder.encode(dto.password());
         }
         user.update(dto.username(), dto.email(), requestedPassword, dto.image(), dto.bio(), null);
-        return ProfileResponse.fromEntity(user, false);
+        return UserResponse.fromEntity(user);
     }
 }
