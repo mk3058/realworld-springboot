@@ -1,10 +1,10 @@
 package com.minkyu.realworld.follow.application;
 
 import com.minkyu.realworld.auth.application.AuthService;
-import com.minkyu.realworld.common.exception.UserNotFoundException;
 import com.minkyu.realworld.follow.domain.Follow;
 import com.minkyu.realworld.follow.domain.repository.FollowRepository;
 import com.minkyu.realworld.jwt.CustomUserDetails;
+import com.minkyu.realworld.user.application.exception.UserNotFoundException;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
@@ -25,9 +25,9 @@ public class FollowService {
     public ProfileResponse createByUsername(String followeeName) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User follower = userRepository.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+            .orElseThrow(UserNotFoundException::new);
         User followee = userRepository.findByUsername(followeeName)
-            .orElseThrow(() -> new UserNotFoundException("Cannot find user named" + followeeName));
+            .orElseThrow(UserNotFoundException::new);
 
         if (followRepository.existsByFollowerAndFollowee(follower, followee)) {
             throw new DuplicateRequestException(follower.getUsername() + " is already following  " +
@@ -42,9 +42,9 @@ public class FollowService {
     public ProfileResponse deleteByUsername(String followeeName) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User follower = userRepository.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+            .orElseThrow(UserNotFoundException::new);
         User followee = userRepository.findByUsername(followeeName)
-            .orElseThrow(() -> new UserNotFoundException("Cannot find user named" + followeeName));
+            .orElseThrow(UserNotFoundException::new);
 
         if (!followRepository.existsByFollowerAndFollowee(follower, followee)) {
             throw new IllegalArgumentException(follower.getUsername() + " is not a follower of " +

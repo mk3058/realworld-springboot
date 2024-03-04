@@ -1,10 +1,10 @@
 package com.minkyu.realworld.user.application;
 
 import com.minkyu.realworld.auth.application.AuthService;
-import com.minkyu.realworld.common.exception.UserNotFoundException;
 import com.minkyu.realworld.follow.application.FollowService;
 import com.minkyu.realworld.follow.domain.repository.FollowRepository;
 import com.minkyu.realworld.jwt.CustomUserDetails;
+import com.minkyu.realworld.user.application.exception.UserNotFoundException;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
@@ -29,7 +29,7 @@ public class UserService {
     public UserResponse findCurrentUser() throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+            .orElseThrow(UserNotFoundException::new);
 
         return UserResponse.fromEntity(user);
     }
@@ -37,7 +37,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public ProfileResponse findUserByUsername(String username) throws Exception {
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UserNotFoundException("Cannot find user " + username));
+            .orElseThrow(UserNotFoundException::new);
 
         CustomUserDetails userDetails;
         try {
@@ -46,7 +46,7 @@ public class UserService {
             return ProfileResponse.fromEntity(user, false);
         }
         User current = userRepository.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+            .orElseThrow(UserNotFoundException::new);
         return ProfileResponse.fromEntity(user, followService.isFollower(current, user));
     }
 
@@ -54,7 +54,7 @@ public class UserService {
     public UserResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
-            .orElseThrow(() -> new UserNotFoundException("Cannot find current user!"));
+            .orElseThrow(UserNotFoundException::new);
         String requestedPassword = dto.password();
 
         if (requestedPassword != null) {
