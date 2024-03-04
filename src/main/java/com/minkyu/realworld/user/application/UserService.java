@@ -26,7 +26,7 @@ public class UserService {
     private final FollowService followService;
 
     @Transactional(readOnly = true)
-    public UserResponse findCurrentUser() throws Exception {
+    public UserResponse findCurrentUser() {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(UserNotFoundException::new);
@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public ProfileResponse findUserByUsername(String username) throws Exception {
+    public ProfileResponse findUserByUsername(String username) {
         User user = userRepository.findByUsername(username)
             .orElseThrow(UserNotFoundException::new);
 
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateCurrentUser(UserUpdateRequest dto) throws Exception {
+    public UserResponse updateCurrentUser(UserUpdateRequest dto) {
         CustomUserDetails userDetails = authService.findAuthenticatedUser();
         User user = userRepository.findByUsername(userDetails.getUsername())
             .orElseThrow(UserNotFoundException::new);

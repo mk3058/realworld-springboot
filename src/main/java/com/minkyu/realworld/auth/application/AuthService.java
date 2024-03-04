@@ -1,5 +1,6 @@
 package com.minkyu.realworld.auth.application;
 
+import com.minkyu.realworld.auth.application.exception.AuthenticationException;
 import com.minkyu.realworld.auth.presentation.dto.JoinRequest;
 import com.minkyu.realworld.auth.presentation.dto.LoginRequest;
 import com.minkyu.realworld.jwt.CustomUserDetails;
@@ -9,8 +10,6 @@ import com.minkyu.realworld.user.application.exception.UserNotFoundException;
 import com.minkyu.realworld.user.domain.User;
 import com.minkyu.realworld.user.domain.repository.UserRepository;
 import com.minkyu.realworld.user.presentation.dto.UserResponse;
-import jakarta.security.auth.message.AuthException;
-import java.nio.file.attribute.UserPrincipalNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +30,7 @@ public class AuthService {
 
 
     @Transactional
-    public UserResponse join(JoinRequest dto) throws Exception {
+    public UserResponse join(JoinRequest dto) {
         String username = dto.username();
         String email = dto.email();
         String encodedPassword = bCryptPasswordEncoder.encode(dto.password());
@@ -46,7 +45,7 @@ public class AuthService {
     }
 
     @Transactional
-    public UserResponse login(LoginRequest dto) throws Exception {
+    public UserResponse login(LoginRequest dto) {
         String email = dto.email();
         String password = dto.password();
 
@@ -60,17 +59,17 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public CustomUserDetails findAuthenticatedUser() throws Exception {
+    public CustomUserDetails findAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new AuthException("User not authenticated!");
+            throw new AuthenticationException();
         }
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof CustomUserDetails) {
             return (CustomUserDetails) principal;
         }
-        throw new UserPrincipalNotFoundException("Cannot find UserDetails!");
+        throw new AuthenticationException();
     }
 }

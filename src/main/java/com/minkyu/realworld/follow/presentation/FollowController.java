@@ -1,6 +1,5 @@
 package com.minkyu.realworld.follow.presentation;
 
-import com.minkyu.realworld.common.error.ErrorResponse;
 import com.minkyu.realworld.follow.application.FollowService;
 import com.minkyu.realworld.user.presentation.dto.ProfileResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +19,14 @@ public class FollowController {
 
     @PostMapping("/{username}/follow")
     public ResponseEntity<?> followUser(@PathVariable("username") String username) {
-        try {
-            ProfileResponse profileResponse = followService.createByUsername(username);
-            return ResponseEntity.ok(profileResponse);
-        } catch (Exception e) {
-            return ResponseEntity.unprocessableEntity()
-                .body(ErrorResponse.fromMessage(e.getMessage()));
-        }
+        ProfileResponse profileResponse = followService.createByUsername(username);
+        return ResponseEntity.ok(profileResponse);
     }
 
     @DeleteMapping("/{username}/follow")
     public ResponseEntity<?> unfollowUser(@PathVariable("username") String username) {
-        try {
-            ProfileResponse profileResponse = followService.deleteByUsername(username);
-            return ResponseEntity.ok(profileResponse);
-        } catch (Exception e) {
-            return ResponseEntity.unprocessableEntity()
-                .body(ErrorResponse.fromMessage(e.getMessage()));
-        }
+        ProfileResponse profileResponse = followService.deleteByUsername(username);
+        return ResponseEntity.ok(profileResponse);
+
     }
 }
