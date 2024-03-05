@@ -16,7 +16,9 @@ public enum ErrorCode {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Unauthorized request"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Permission denied"),
     ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "Article not found"),
-    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "Tag not found");
+    TAG_NOT_FOUND(HttpStatus.NOT_FOUND, "Tag not found"),
+    TAG_ALREADY_INCLUDED(HttpStatus.UNPROCESSABLE_ENTITY, "Thg already included in post"),
+    TAG_NOT_INCLUDED(HttpStatus.UNPROCESSABLE_ENTITY, "Tag is not included in post");
 
     private final HttpStatus status;
     private final String message;
