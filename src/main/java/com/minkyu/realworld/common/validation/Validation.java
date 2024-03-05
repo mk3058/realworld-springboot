@@ -92,4 +92,20 @@ public class Validation {
         Preconditions.checkArgument(Pattern.compile(urlPattern).matcher(url).matches(),
             "invalid url format");
     }
+
+    public static void title(String title) {
+        Preconditions.checkNotNull(title, "title must be provided");
+        Preconditions.checkArgument(title.length() <= 100,
+            "title length must be less or equal to 100");
+    }
+
+    public static void slug(String slug) {
+        Preconditions.checkNotNull(slug, "slug must be provided");
+        Preconditions.checkArgument(slug.length() <= 100,
+            "slug length must be less or equal to 100");
+    }
+
+    public static void body(String body) {
+        Preconditions.checkNotNull(body, "body must be provided");
+    }
 }
