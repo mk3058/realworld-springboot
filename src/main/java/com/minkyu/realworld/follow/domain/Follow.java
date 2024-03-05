@@ -3,6 +3,7 @@ package com.minkyu.realworld.follow.domain;
 import com.google.common.base.Preconditions;
 import com.minkyu.realworld.user.domain.User;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,11 +22,11 @@ public class Follow {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
     private User follower;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "followee_id")
     private User followee;
 
@@ -34,7 +35,7 @@ public class Follow {
         Preconditions.checkNotNull(followee, "followee must be provided");
         Preconditions.checkArgument(!follower.getId().equals(followee.getId()),
             "follower and followee cannot be same");
-        
+
         this.follower = follower;
         this.followee = followee;
     }
